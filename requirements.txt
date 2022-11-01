@@ -1,0 +1,7 @@
+flask
+flask-cors
+requests
+pymysql
+email-validator
+phonenumbers
+google-i18n-address
