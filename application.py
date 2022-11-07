@@ -12,13 +12,13 @@ from models.Email import EmailQueryModel
 from models.Phone import PhoneQueryModel
 from models.UserContacts import UserContactsQueryModel
 
-# Create the Flask application object.
-app = Flask(__name__)
+# Create the Flask applicationlication object.
+application = Flask(__name__)
 
-CORS(app)
+CORS(application)
 
 
-@app.get("/api/health")
+@application.get("/api/health")
 def get_health():
     t = str(datetime.now())
     msg = {
@@ -28,12 +28,12 @@ def get_health():
     }
 
     result = Response(json.dumps(msg), status=200,
-                      content_type="application/json")
+                      content_type="applicationlication/json")
 
     return result
 
 
-@app.route("/api/user/<userId>/contact", methods=["GET", "POST", "PUT", "DELETE"])
+@application.route("/api/user/<userId>/contact", methods=["GET", "POST", "PUT", "DELETE"])
 def contact_info_by_user_id(userId):
     def get_contact_info(user_contact):
         result = {
@@ -49,7 +49,7 @@ def contact_info_by_user_id(userId):
         with EmailQueryModel() as eqm:
             emails = eqm.get_emails_by_user_id(user_id=userId)
             for email in emails:
-                result["emails"].append({
+                result["emails"].applicationend({
                     "userId": email.user_id,
                     "emailId": email.email_id,
                     "emailType": email.email_type,
@@ -59,7 +59,7 @@ def contact_info_by_user_id(userId):
         with PhoneQueryModel() as pqm:
             phones = pqm.get_phones_by_user_id(user_id=userId)
             for phone in phones:
-                result["phones"].append({
+                result["phones"].applicationend({
                     "userId": phone.user_id,
                     "phoneId": phone.phone_id,
                     "phoneType": phone.phone_type,
@@ -69,7 +69,7 @@ def contact_info_by_user_id(userId):
         with AddressQueryModel() as aqm:
             addresses = aqm.get_addresses_by_user_id(user_id=userId)
             for address in addresses:
-                result["addresses"].append({
+                result["addresses"].applicationend({
                     "userId": address.user_id,
                     "addressId": address.address_id,
                     "addressType": address.address_type,
@@ -91,7 +91,7 @@ def contact_info_by_user_id(userId):
                     result = get_contact_info(user_contact=user_contact)
 
                     rsp = Response(json.dumps(result), status=200,
-                                   content_type="application/json")
+                                   content_type="applicationlication/json")
                     return rsp
                 else:
                     rsp = Response("user not found", status=404,
@@ -146,7 +146,7 @@ def contact_info_by_user_id(userId):
                 result = get_contact_info(user_contact=user_contact)
 
                 rsp = Response(json.dumps(result), status=200,
-                               content_type="application/json")
+                               content_type="applicationlication/json")
                 return rsp
 
             elif request.method == "DELETE":
@@ -156,7 +156,7 @@ def contact_info_by_user_id(userId):
                     ucqm.delete_user_contacts_by_user_id(user_id=userId)
 
                     rsp = Response("ok", status=200,
-                                   content_type="application/json")
+                                   content_type="applicationlication/json")
                     return rsp
                 else:
                     rsp = Response("user not found", status=404,
@@ -199,7 +199,7 @@ def get_email(email):
     return result
 
 
-@app.post("/api/user/<userId>/contact/email")
+@application.post("/api/user/<userId>/contact/email")
 def add_email_by_user_id(userId):
     email_info = request.get_json()
     try:
@@ -220,7 +220,7 @@ def add_email_by_user_id(userId):
             result = get_email(email=email)
 
             rsp = Response(json.dumps(result), status=200,
-                           content_type="application/json")
+                           content_type="applicationlication/json")
             return rsp
 
     except Exception as e:
@@ -229,7 +229,7 @@ def add_email_by_user_id(userId):
         return rsp
 
 
-@app.route("/api/user/<userId>/contact/email/<emailId>", methods=["GET", "PUT", "DELETE"])
+@application.route("/api/user/<userId>/contact/email/<emailId>", methods=["GET", "PUT", "DELETE"])
 def email_by_user_id(userId, emailId):
     try:
         with EmailQueryModel() as eqm:
@@ -240,7 +240,7 @@ def email_by_user_id(userId, emailId):
                     result = get_email(email=email)
 
                     rsp = Response(json.dumps(result), status=200,
-                                   content_type="application/json")
+                                   content_type="applicationlication/json")
                     return rsp
                 else:
                     rsp = Response("email/user not found", status=404,
@@ -271,7 +271,7 @@ def email_by_user_id(userId, emailId):
                 result = get_email(email=email)
 
                 rsp = Response(json.dumps(result), status=200,
-                               content_type="application/json")
+                               content_type="applicationlication/json")
                 return rsp
 
             elif request.method == "DELETE":
@@ -282,7 +282,7 @@ def email_by_user_id(userId, emailId):
                         user_id=userId, email_id=emailId)
 
                     rsp = Response("ok", status=200,
-                                   content_type="application/json")
+                                   content_type="applicationlication/json")
                     return rsp
                 else:
                     rsp = Response("user/email not found", status=404,
@@ -330,7 +330,7 @@ def get_phone(phone):
     return result
 
 
-@app.post("/api/user/<userId>/contact/phone")
+@application.post("/api/user/<userId>/contact/phone")
 def add_phone_by_user_id(userId):
     phone_info = request.get_json()
     try:
@@ -351,7 +351,7 @@ def add_phone_by_user_id(userId):
             result = get_phone(phone=phone)
 
             rsp = Response(json.dumps(result), status=200,
-                           content_type="application/json")
+                           content_type="applicationlication/json")
             return rsp
 
     except Exception as e:
@@ -360,7 +360,7 @@ def add_phone_by_user_id(userId):
         return rsp
 
 
-@app.route("/api/user/<userId>/contact/phone/<phoneId>", methods=["GET", "PUT", "DELETE"])
+@application.route("/api/user/<userId>/contact/phone/<phoneId>", methods=["GET", "PUT", "DELETE"])
 def phone_by_user_id(userId, phoneId):
     try:
         with PhoneQueryModel() as pqm:
@@ -371,7 +371,7 @@ def phone_by_user_id(userId, phoneId):
                     result = get_phone(phone=phone)
 
                     rsp = Response(json.dumps(result), status=200,
-                                   content_type="application/json")
+                                   content_type="applicationlication/json")
                     return rsp
                 else:
                     rsp = Response("phone/user not found", status=404,
@@ -402,7 +402,7 @@ def phone_by_user_id(userId, phoneId):
                 result = get_phone(phone=phone)
 
                 rsp = Response(json.dumps(result), status=200,
-                               content_type="application/json")
+                               content_type="applicationlication/json")
                 return rsp
 
             elif request.method == "DELETE":
@@ -413,7 +413,7 @@ def phone_by_user_id(userId, phoneId):
                         user_id=userId, phone_id=phoneId)
 
                     rsp = Response("ok", status=200,
-                                   content_type="application/json")
+                                   content_type="applicationlication/json")
                     return rsp
                 else:
                     rsp = Response("user/phone not found", status=404,
@@ -472,7 +472,7 @@ def get_address(address):
     return result
 
 
-@app.post("/api/user/<userId>/contact/address")
+@application.post("/api/user/<userId>/contact/address")
 def add_address_by_user_id(userId):
     address_info = request.get_json()
     try:
@@ -493,7 +493,7 @@ def add_address_by_user_id(userId):
             result = get_address(address=address)
 
             rsp = Response(json.dumps(result), status=200,
-                           content_type="application/json")
+                           content_type="applicationlication/json")
             return rsp
 
     except Exception as e:
@@ -502,7 +502,7 @@ def add_address_by_user_id(userId):
         return rsp
 
 
-@app.route("/api/user/<userId>/contact/address/<addressId>", methods=["GET", "PUT", "DELETE"])
+@application.route("/api/user/<userId>/contact/address/<addressId>", methods=["GET", "PUT", "DELETE"])
 def address_by_user_id(userId, addressId):
     try:
         with AddressQueryModel() as aqm:
@@ -513,7 +513,7 @@ def address_by_user_id(userId, addressId):
                     result = get_address(address=address)
 
                     rsp = Response(json.dumps(result), status=200,
-                                   content_type="application/json")
+                                   content_type="applicationlication/json")
                     return rsp
                 else:
                     rsp = Response("address/user not found", status=404,
@@ -545,7 +545,7 @@ def address_by_user_id(userId, addressId):
                 result = get_address(address=address)
 
                 rsp = Response(json.dumps(result), status=200,
-                               content_type="application/json")
+                               content_type="applicationlication/json")
                 return rsp
 
             elif request.method == "DELETE":
@@ -556,7 +556,7 @@ def address_by_user_id(userId, addressId):
                         user_id=userId, address_id=addressId)
 
                     rsp = Response("ok", status=200,
-                                   content_type="application/json")
+                                   content_type="applicationlication/json")
                     return rsp
                 else:
                     rsp = Response("user/address not found", status=404,
@@ -570,4 +570,4 @@ def address_by_user_id(userId, addressId):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5011)
+    application.run(host="0.0.0.0", port=5011)
