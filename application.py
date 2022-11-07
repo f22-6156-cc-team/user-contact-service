@@ -28,7 +28,7 @@ def get_health():
     }
 
     result = Response(json.dumps(msg), status=200,
-                      content_type="applicationlication/json")
+                      content_type="application/json")
 
     return result
 
@@ -91,7 +91,7 @@ def contact_info_by_user_id(userId):
                     result = get_contact_info(user_contact=user_contact)
 
                     rsp = Response(json.dumps(result), status=200,
-                                   content_type="applicationlication/json")
+                                   content_type="application/json")
                     return rsp
                 else:
                     rsp = Response("user not found", status=404,
@@ -146,7 +146,7 @@ def contact_info_by_user_id(userId):
                 result = get_contact_info(user_contact=user_contact)
 
                 rsp = Response(json.dumps(result), status=200,
-                               content_type="applicationlication/json")
+                               content_type="application/json")
                 return rsp
 
             elif request.method == "DELETE":
@@ -156,7 +156,7 @@ def contact_info_by_user_id(userId):
                     ucqm.delete_user_contacts_by_user_id(user_id=userId)
 
                     rsp = Response("ok", status=200,
-                                   content_type="applicationlication/json")
+                                   content_type="application/json")
                     return rsp
                 else:
                     rsp = Response("user not found", status=404,
@@ -220,7 +220,7 @@ def add_email_by_user_id(userId):
             result = get_email(email=email)
 
             rsp = Response(json.dumps(result), status=200,
-                           content_type="applicationlication/json")
+                           content_type="application/json")
             return rsp
 
     except Exception as e:
@@ -240,7 +240,7 @@ def email_by_user_id(userId, emailId):
                     result = get_email(email=email)
 
                     rsp = Response(json.dumps(result), status=200,
-                                   content_type="applicationlication/json")
+                                   content_type="application/json")
                     return rsp
                 else:
                     rsp = Response("email/user not found", status=404,
@@ -271,7 +271,7 @@ def email_by_user_id(userId, emailId):
                 result = get_email(email=email)
 
                 rsp = Response(json.dumps(result), status=200,
-                               content_type="applicationlication/json")
+                               content_type="application/json")
                 return rsp
 
             elif request.method == "DELETE":
@@ -282,7 +282,7 @@ def email_by_user_id(userId, emailId):
                         user_id=userId, email_id=emailId)
 
                     rsp = Response("ok", status=200,
-                                   content_type="applicationlication/json")
+                                   content_type="application/json")
                     return rsp
                 else:
                     rsp = Response("user/email not found", status=404,
@@ -351,7 +351,7 @@ def add_phone_by_user_id(userId):
             result = get_phone(phone=phone)
 
             rsp = Response(json.dumps(result), status=200,
-                           content_type="applicationlication/json")
+                           content_type="application/json")
             return rsp
 
     except Exception as e:
@@ -371,7 +371,7 @@ def phone_by_user_id(userId, phoneId):
                     result = get_phone(phone=phone)
 
                     rsp = Response(json.dumps(result), status=200,
-                                   content_type="applicationlication/json")
+                                   content_type="application/json")
                     return rsp
                 else:
                     rsp = Response("phone/user not found", status=404,
@@ -402,7 +402,7 @@ def phone_by_user_id(userId, phoneId):
                 result = get_phone(phone=phone)
 
                 rsp = Response(json.dumps(result), status=200,
-                               content_type="applicationlication/json")
+                               content_type="application/json")
                 return rsp
 
             elif request.method == "DELETE":
@@ -413,7 +413,7 @@ def phone_by_user_id(userId, phoneId):
                         user_id=userId, phone_id=phoneId)
 
                     rsp = Response("ok", status=200,
-                                   content_type="applicationlication/json")
+                                   content_type="application/json")
                     return rsp
                 else:
                     rsp = Response("user/phone not found", status=404,
@@ -493,7 +493,7 @@ def add_address_by_user_id(userId):
             result = get_address(address=address)
 
             rsp = Response(json.dumps(result), status=200,
-                           content_type="applicationlication/json")
+                           content_type="application/json")
             return rsp
 
     except Exception as e:
@@ -513,7 +513,7 @@ def address_by_user_id(userId, addressId):
                     result = get_address(address=address)
 
                     rsp = Response(json.dumps(result), status=200,
-                                   content_type="applicationlication/json")
+                                   content_type="application/json")
                     return rsp
                 else:
                     rsp = Response("address/user not found", status=404,
@@ -545,7 +545,7 @@ def address_by_user_id(userId, addressId):
                 result = get_address(address=address)
 
                 rsp = Response(json.dumps(result), status=200,
-                               content_type="applicationlication/json")
+                               content_type="application/json")
                 return rsp
 
             elif request.method == "DELETE":
@@ -556,7 +556,7 @@ def address_by_user_id(userId, addressId):
                         user_id=userId, address_id=addressId)
 
                     rsp = Response("ok", status=200,
-                                   content_type="applicationlication/json")
+                                   content_type="application/json")
                     return rsp
                 else:
                     rsp = Response("user/address not found", status=404,
