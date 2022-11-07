@@ -18,7 +18,7 @@ application = Flask(__name__)
 CORS(application)
 
 
-@application.get("/")
+@application.get("/api/health")
 def get_health():
     t = str(datetime.now())
     msg = {
@@ -570,5 +570,4 @@ def address_by_user_id(userId, addressId):
 
 
 if __name__ == "__main__":
-    application.debug = True
-    application.run()
+    application.run(host="0.0.0.0", port=8000)

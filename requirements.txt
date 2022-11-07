@@ -1,6 +1,7 @@
 flask
 flask-cors
 requests
+sqlalchemy
 pymysql
 email-validator
 phonenumbers
