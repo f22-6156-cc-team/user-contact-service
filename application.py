@@ -18,7 +18,7 @@ application = Flask(__name__)
 CORS(application)
 
 
-@application.get("/api/health")
+@application.get("/")
 def get_health():
     t = str(datetime.now())
     msg = {
