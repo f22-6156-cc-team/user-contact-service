@@ -1,7 +1,7 @@
 import requests
 import json
 
-HOST = "http://127.0.0.1:5000"
+HOST = "http://usercontactsservice-env.eba-xik23ras.us-east-1.elasticbeanstalk.com/"
 
 
 def test_health():
@@ -54,7 +54,7 @@ def test_user_contact():
 
         h_message = requests.post(email_api, json={
             "emailType": "Personal",
-            "address": "wczhao16@eoutlook.com"
+            "address": "wczhao16@outlook.com"
         })
         if h_message.status_code == 200:
             print("Add Email message = \n")

@@ -12,7 +12,7 @@ from models.Email import EmailQueryModel
 from models.Phone import PhoneQueryModel
 from models.UserContacts import UserContactsQueryModel
 
-# Create the Flask applicationlication object.
+# Create the Flask application object.
 application = Flask(__name__)
 
 CORS(application)
@@ -49,7 +49,7 @@ def contact_info_by_user_id(userId):
         with EmailQueryModel() as eqm:
             emails = eqm.get_emails_by_user_id(user_id=userId)
             for email in emails:
-                result["emails"].applicationend({
+                result["emails"].append({
                     "userId": email.user_id,
                     "emailId": email.email_id,
                     "emailType": email.email_type,
@@ -59,7 +59,7 @@ def contact_info_by_user_id(userId):
         with PhoneQueryModel() as pqm:
             phones = pqm.get_phones_by_user_id(user_id=userId)
             for phone in phones:
-                result["phones"].applicationend({
+                result["phones"].append({
                     "userId": phone.user_id,
                     "phoneId": phone.phone_id,
                     "phoneType": phone.phone_type,
@@ -69,7 +69,7 @@ def contact_info_by_user_id(userId):
         with AddressQueryModel() as aqm:
             addresses = aqm.get_addresses_by_user_id(user_id=userId)
             for address in addresses:
-                result["addresses"].applicationend({
+                result["addresses"].append({
                     "userId": address.user_id,
                     "addressId": address.address_id,
                     "addressType": address.address_type,
