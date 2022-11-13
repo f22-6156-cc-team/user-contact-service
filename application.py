@@ -19,6 +19,7 @@ CORS(application)
 
 
 @application.get("/api/health")
+@application.get("/")
 def get_health():
     t = str(datetime.now())
     msg = {
@@ -136,10 +137,10 @@ def contact_info_by_user_id(userId):
 
                 if request.method == "POST":
                     ucqm.add_user_contacts_by_user_id(
-                        user_id=userId, contact_info=user_contact_info)
+                        user_id=userId, contact_info=user_contact_info_db)
                 else:
                     ucqm.update_user_contacts_by_user_id(
-                        user_id=userId, contact_info=user_contact_info)
+                        user_id=userId, contact_info=user_contact_info_db)
 
                 user_contact = ucqm.get_user_contacts_by_user_id(
                     user_id=userId)

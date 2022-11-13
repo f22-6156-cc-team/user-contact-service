@@ -1,11 +1,11 @@
 import requests
 import json
 
-HOST = "http://usercontactsservice-env.eba-xik23ras.us-east-1.elasticbeanstalk.com/"
+HOST = "https://gy8a0m85ci.execute-api.us-east-1.amazonaws.com/v1"
 
 
 def test_health():
-    health_url = f"{HOST}/api/health"
+    health_url = f"{HOST}/health"
     try:
         h_message = requests.get(health_url)
         if h_message.status_code == 200:
@@ -25,10 +25,10 @@ def test_health():
 
 def test_user_contact():
     userId = 42
-    user_contact_api = f"{HOST}/api/user/{userId}/contact"
-    email_api = f"{HOST}/api/user/{userId}/contact/email"
-    phone_api = f"{HOST}/api/user/{userId}/contact/phone"
-    address_api = f"{HOST}/api/user/{userId}/contact/address"
+    user_contact_api = f"{HOST}/user/{userId}/contact"
+    email_api = f"{HOST}/user/{userId}/contact/email"
+    phone_api = f"{HOST}/user/{userId}/contact/phone"
+    address_api = f"{HOST}/user/{userId}/contact/address"
     try:
         h_message = requests.post(user_contact_api, json={})
         if h_message.status_code == 200:
@@ -243,5 +243,5 @@ def test_user_contact():
 
 
 if __name__ == "__main__":
-    test_health()
+    # test_health()
     test_user_contact()
