@@ -1,11 +1,15 @@
 import json
+import os
 from datetime import datetime
 
 import phonenumbers
+import requests
 from email_validator import validate_email
 from flask import Flask, Response, request
 from flask_cors import CORS
-from i18naddress import normalize_address
+from flask_jwt_extended import (JWTManager, create_access_token,
+                                create_refresh_token, get_jwt_identity,
+                                jwt_required)
 
 from models.Address import AddressQueryModel
 from models.Email import EmailQueryModel
@@ -16,6 +20,12 @@ from models.UserContacts import UserContactsQueryModel
 application = Flask(__name__)
 
 CORS(application)
+application.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+GOOGLE_MAP_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+GOOGLE_MAP_ADDRESS_VALIDATION_ENDPOINT = os.getenv(
+    "GOOGLE_MAP_ADDRESS_VALIDATION_ENDPOINT")
+
+jwt = JWTManager(application)
 
 
 @application.get("/api/health")
@@ -35,6 +45,7 @@ def get_health():
 
 
 @application.route("/api/user/<userId>/contact", methods=["GET", "POST", "PUT", "DELETE"])
+@jwt_required()
 def contact_info_by_user_id(userId):
     def get_contact_info(user_contact):
         result = {
@@ -100,6 +111,12 @@ def contact_info_by_user_id(userId):
                     return rsp
 
             elif request.method == "POST" or request.method == "PUT":
+                current_uid = get_jwt_identity()
+                if current_uid != userId:
+                    rsp = Response("Inconsistent user", status=401,
+                                   content_type="text/plain")
+                    return rsp
+
                 user_contact_info = request.get_json()
                 user_contact_info_db = {}
                 if "primaryEmailId" in user_contact_info:
@@ -151,6 +168,12 @@ def contact_info_by_user_id(userId):
                 return rsp
 
             elif request.method == "DELETE":
+                current_uid = get_jwt_identity()
+                if current_uid != userId:
+                    rsp = Response("Inconsistent user", status=401,
+                                   content_type="text/plain")
+                    return rsp
+
                 user_contact = ucqm.get_user_contacts_by_user_id(
                     user_id=userId)
                 if user_contact:
@@ -201,7 +224,14 @@ def get_email(email):
 
 
 @application.post("/api/user/<userId>/contact/email")
+@jwt_required()
 def add_email_by_user_id(userId):
+    current_uid = get_jwt_identity()
+    if current_uid != userId:
+        rsp = Response("Inconsistent user", status=401,
+                       content_type="text/plain")
+        return rsp
+
     email_info = request.get_json()
     try:
         email_info_db = validate_email_info(
@@ -231,6 +261,7 @@ def add_email_by_user_id(userId):
 
 
 @application.route("/api/user/<userId>/contact/email/<emailId>", methods=["GET", "PUT", "DELETE"])
+@jwt_required()
 def email_by_user_id(userId, emailId):
     try:
         with EmailQueryModel() as eqm:
@@ -249,6 +280,12 @@ def email_by_user_id(userId, emailId):
                     return rsp
 
             elif request.method == "PUT":
+                current_uid = get_jwt_identity()
+                if current_uid != userId:
+                    rsp = Response("Inconsistent user", status=401,
+                                   content_type="text/plain")
+                    return rsp
+
                 email_info = request.get_json()
                 try:
                     email_info_db = validate_email_info(email_info=email_info)
@@ -276,6 +313,12 @@ def email_by_user_id(userId, emailId):
                 return rsp
 
             elif request.method == "DELETE":
+                current_uid = get_jwt_identity()
+                if current_uid != userId:
+                    rsp = Response("Inconsistent user", status=401,
+                                   content_type="text/plain")
+                    return rsp
+
                 email = eqm.get_email_by_user_id_and_email_id(
                     user_id=userId, email_id=emailId)
                 if email:
@@ -332,7 +375,14 @@ def get_phone(phone):
 
 
 @application.post("/api/user/<userId>/contact/phone")
+@jwt_required()
 def add_phone_by_user_id(userId):
+    current_uid = get_jwt_identity()
+    if current_uid != userId:
+        rsp = Response("Inconsistent user", status=401,
+                       content_type="text/plain")
+        return rsp
+
     phone_info = request.get_json()
     try:
         phone_info_db = validate_phone_info(
@@ -362,6 +412,7 @@ def add_phone_by_user_id(userId):
 
 
 @application.route("/api/user/<userId>/contact/phone/<phoneId>", methods=["GET", "PUT", "DELETE"])
+@jwt_required()
 def phone_by_user_id(userId, phoneId):
     try:
         with PhoneQueryModel() as pqm:
@@ -380,6 +431,12 @@ def phone_by_user_id(userId, phoneId):
                     return rsp
 
             elif request.method == "PUT":
+                current_uid = get_jwt_identity()
+                if current_uid != userId:
+                    rsp = Response("Inconsistent user", status=401,
+                                   content_type="text/plain")
+                    return rsp
+
                 phone_info = request.get_json()
                 try:
                     phone_info_db = validate_phone_info(phone_info=phone_info)
@@ -407,6 +464,12 @@ def phone_by_user_id(userId, phoneId):
                 return rsp
 
             elif request.method == "DELETE":
+                current_uid = get_jwt_identity()
+                if current_uid != userId:
+                    rsp = Response("Inconsistent user", status=401,
+                                   content_type="text/plain")
+                    return rsp
+
                 phone = pqm.get_phone_by_user_id_and_phone_id(
                     user_id=userId, phone_id=phoneId)
                 if phone:
@@ -441,17 +504,28 @@ def validate_address_info(address_info, check_required=False):
     if check_required and any(name not in address_info for name in required_fields):
         raise Exception("missing address parts")
     elif all(name in address_info for name in required_fields):
-        normalized_address = normalize_address({
-            'country_code': 'US',
-            'city': address_info['city'],
-            'country_area': address_info['state'],
-            'postal_code': address_info['zip'],
-            'street_address': address_info['addressLine1']
-        })
-        address_info_db["address_line1"] = normalized_address['street_address']
-        address_info_db["city"] = normalized_address["city"]
-        address_info_db["state"] = normalized_address["country_area"]
-        address_info_db["zip"] = normalized_address["postal_code"]
+        request_body = {
+            "address": {
+                "regionCode": "US",
+                "locality": address_info['city'],
+                "administrativeArea": address_info['state'],
+                "postalCode": address_info['zip'],
+                "addressLines": [address_info['addressLine1']]
+            },
+            "enableUspsCass": True
+        }
+        address_validation_resp = requests.post(GOOGLE_MAP_ADDRESS_VALIDATION_ENDPOINT, params={
+                                                "key": GOOGLE_MAP_API_KEY}, json=request_body, headers={'content-type': 'application/json'})
+        if address_validation_resp.status_code == 200:
+            address_validation_result = address_validation_resp.json()[
+                'result']
+            usps_address = address_validation_result['uspsData']['standardizedAddress']
+            address_info_db["address_line1"] = usps_address['firstAddressLine']
+            address_info_db["city"] = usps_address["city"]
+            address_info_db["state"] = usps_address["state"]
+            address_info_db["zip"] = usps_address["zipCode"]
+        else:
+            raise Exception("unable to verify address")
 
     if "addressLine2" in address_info:
         address_info_db["address_line2"] = address_info['addressLine2']
@@ -474,7 +548,14 @@ def get_address(address):
 
 
 @application.post("/api/user/<userId>/contact/address")
+@jwt_required()
 def add_address_by_user_id(userId):
+    current_uid = get_jwt_identity()
+    if current_uid != userId:
+        rsp = Response("Inconsistent user", status=401,
+                       content_type="text/plain")
+        return rsp
+
     address_info = request.get_json()
     try:
         address_info_db = validate_address_info(
@@ -504,6 +585,7 @@ def add_address_by_user_id(userId):
 
 
 @application.route("/api/user/<userId>/contact/address/<addressId>", methods=["GET", "PUT", "DELETE"])
+@jwt_required()
 def address_by_user_id(userId, addressId):
     try:
         with AddressQueryModel() as aqm:
@@ -522,6 +604,12 @@ def address_by_user_id(userId, addressId):
                     return rsp
 
             elif request.method == "PUT":
+                current_uid = get_jwt_identity()
+                if current_uid != userId:
+                    rsp = Response("Inconsistent user", status=401,
+                                   content_type="text/plain")
+                    return rsp
+
                 address_info = request.get_json()
                 try:
                     address_info_db = validate_address_info(
@@ -550,6 +638,12 @@ def address_by_user_id(userId, addressId):
                 return rsp
 
             elif request.method == "DELETE":
+                current_uid = get_jwt_identity()
+                if current_uid != userId:
+                    rsp = Response("Inconsistent user", status=401,
+                                   content_type="text/plain")
+                    return rsp
+
                 address = aqm.get_address_by_user_id_and_address_id(
                     user_id=userId, address_id=addressId)
                 if address:

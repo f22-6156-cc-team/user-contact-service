@@ -3,6 +3,14 @@ import json
 
 HOST = "https://gy8a0m85ci.execute-api.us-east-1.amazonaws.com/v1"
 
+class BearerAuth(requests.auth.AuthBase):
+    def __init__(self, token):
+        self.token = token
+
+    def __call__(self, r):
+        r.headers["authorization"] = "Bearer " + self.token
+        return r
+
 
 def test_health():
     health_url = f"{HOST}/health"
@@ -24,13 +32,14 @@ def test_health():
 
 
 def test_user_contact():
-    userId = 42
+    userId = ""
+    access_token = ""
     user_contact_api = f"{HOST}/user/{userId}/contact"
     email_api = f"{HOST}/user/{userId}/contact/email"
     phone_api = f"{HOST}/user/{userId}/contact/phone"
     address_api = f"{HOST}/user/{userId}/contact/address"
     try:
-        h_message = requests.post(user_contact_api, json={})
+        h_message = requests.post(user_contact_api, json={}, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Add User Contact message = \n")
             data = h_message.json()
@@ -41,7 +50,7 @@ def test_user_contact():
                   h_message.status_code, h_message.text, "\n\n")
             print("\n")
 
-        h_message = requests.get(user_contact_api)
+        h_message = requests.get(user_contact_api, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Get User Contact message = \n")
             data = h_message.json()
@@ -55,7 +64,7 @@ def test_user_contact():
         h_message = requests.post(email_api, json={
             "emailType": "Personal",
             "address": "wczhao16@outlook.com"
-        })
+        }, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Add Email message = \n")
             data = h_message.json()
@@ -69,7 +78,7 @@ def test_user_contact():
 
         email_api_sp = f"{email_api}/{email_id}"
 
-        h_message = requests.get(email_api_sp)
+        h_message = requests.get(email_api_sp, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Get Email message = \n")
             data = h_message.json()
@@ -81,7 +90,7 @@ def test_user_contact():
             print("\n")
 
         h_message = requests.put(
-            email_api_sp, json={"address": "wz2578@columbia.edu"})
+            email_api_sp, json={"address": "wz2578@columbia.edu"}, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Update Email message = \n")
             data = h_message.json()
@@ -95,7 +104,7 @@ def test_user_contact():
         h_message = requests.post(phone_api, json={
             "phoneType": "Mobile",
             "number": "5182699829"
-        })
+        }, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Add Phone message = \n")
             data = h_message.json()
@@ -109,7 +118,7 @@ def test_user_contact():
 
         phone_api_sp = f"{phone_api}/{phone_id}"
 
-        h_message = requests.get(phone_api_sp)
+        h_message = requests.get(phone_api_sp, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Get Phone message = \n")
             data = h_message.json()
@@ -120,7 +129,7 @@ def test_user_contact():
                   h_message.status_code, h_message.text, "\n\n")
             print("\n")
 
-        h_message = requests.put(phone_api_sp, json={"number": "2126587933"})
+        h_message = requests.put(phone_api_sp, json={"number": "2126587933"}, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Update Phone message = \n")
             data = h_message.json()
@@ -137,7 +146,7 @@ def test_user_contact():
                                                      "city": "Palo Alto",
                                                      "state": "CA",
                                                      "zip": "94301"
-                                                     })
+                                                     }, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Add Address message = \n")
             data = h_message.json()
@@ -151,7 +160,7 @@ def test_user_contact():
 
         address_api_sp = f"{address_api}/{address_id}"
 
-        h_message = requests.get(address_api_sp)
+        h_message = requests.get(address_api_sp, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Get Address message = \n")
             data = h_message.json()
@@ -167,7 +176,7 @@ def test_user_contact():
                                  "addressLine2": "Apt 5G",
                                  "city": "Manhattan",
                                  "state": "Ny",
-                                 "zip": "10027"})
+                                 "zip": "10027"}, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Update Address message = \n")
             data = h_message.json()
@@ -182,7 +191,7 @@ def test_user_contact():
             "primaryEmailId": email_id,
             "primaryPhoneId": phone_id,
             "primaryAddressId": address_id
-        })
+        }, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Update User Contact message = \n")
             data = h_message.json()
@@ -193,7 +202,7 @@ def test_user_contact():
                   h_message.status_code, h_message.text, "\n\n")
             print("\n")
 
-        h_message = requests.delete(address_api_sp)
+        h_message = requests.delete(address_api_sp, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Delete Address message = \n")
             data = h_message.text
@@ -204,7 +213,7 @@ def test_user_contact():
                   h_message.status_code, h_message.text, "\n\n")
             print("\n")
 
-        h_message = requests.delete(phone_api_sp)
+        h_message = requests.delete(phone_api_sp, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Delete Phone message = \n")
             data = h_message.text
@@ -215,7 +224,7 @@ def test_user_contact():
                   h_message.status_code, h_message.text, "\n\n")
             print("\n")
 
-        h_message = requests.delete(email_api_sp)
+        h_message = requests.delete(email_api_sp, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Delete Email message = \n")
             data = h_message.text
@@ -226,7 +235,7 @@ def test_user_contact():
                   h_message.status_code, h_message.text, "\n\n")
             print("\n")
 
-        h_message = requests.delete(user_contact_api)
+        h_message = requests.delete(user_contact_api, auth=BearerAuth(access_token))
         if h_message.status_code == 200:
             print("Delete User Contact message = \n")
             data = h_message.text
