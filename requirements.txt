@@ -5,4 +5,4 @@ sqlalchemy
 pymysql
 email-validator
 phonenumbers
-google-i18n-address
+flask_jwt_extended
