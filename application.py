@@ -160,6 +160,13 @@ def contact_info_by_user_id(userId):
                             user_contact_info_db["primary_address_id"] = user_contact_info["primaryAddressId"]
 
                 if request.method == "POST":
+                    user_contact = ucqm.get_user_contacts_by_user_id(
+                        user_id=userId)
+                    if user_contact:
+                        rsp = Response("user conflict", status=409,
+                                    content_type="text/plain")
+                        return rsp
+
                     ucqm.add_user_contacts_by_user_id(
                         user_id=userId, contact_info=user_contact_info_db)
                 else:
