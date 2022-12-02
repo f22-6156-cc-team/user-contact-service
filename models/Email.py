@@ -18,21 +18,29 @@ class EmailQueryModel(BaseQueryModel):
             Email.email_id == email_id).filter(Email.is_active == True).first()
         return email
 
-    def add_email_by_user_id(self, user_id, email_info=None):
-        email = Email(
-            user_id=user_id,
-            is_active=True
-        )
-        if email_info:
-            for key, value in email_info.items():
-                setattr(email, key, value)
+    def add_email_by_user_id(self, user_id, email_id, email_info=None):
+        inactive_user_email = self.session.query(Email).filter(
+            Email.user_id == user_id).filter(
+            Email.email_id == email_id).filter(Email.is_active == False).first()
+        if inactive_user_email:
+            inactive_user_email.is_active = True
+            if email_info:
+                for key, value in email_info.items():
+                    setattr(inactive_user_email, key, value)
+            self.session.commit()
+        else:
+            email = Email(
+                user_id=user_id,
+                email_id=email_id,
+                is_active=True
+            )
+            if email_info:
+                for key, value in email_info.items():
+                    setattr(email, key, value)
 
-        self.session.add(email)
-        self.session.flush()
+            self.session.add(email)
+            self.session.commit()
 
-        email_id = email.email_id
-        self.session.commit()
-        return email_id
 
     def update_email_by_user_id_and_email_id(self, user_id, email_id, email_info=None):
         email = self.session.query(Email).filter(

@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+import uuid
 
 import phonenumbers
 import requests
@@ -24,6 +25,12 @@ application.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 GOOGLE_MAP_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 GOOGLE_MAP_ADDRESS_VALIDATION_ENDPOINT = os.getenv(
     "GOOGLE_MAP_ADDRESS_VALIDATION_ENDPOINT")
+UUID_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_DNS, 'asachiri.com')
+
+
+def hash_uuid(s):
+    return str(uuid.uuid5(UUID_NAMESPACE, s))
+
 
 jwt = JWTManager(application)
 
@@ -241,10 +248,21 @@ def add_email_by_user_id(userId):
                        content_type="text/plain")
         return rsp
 
+    email_id = hash_uuid(email_info_db["email_address"])
+
     try:
         with EmailQueryModel() as eqm:
-            email_id = eqm.add_email_by_user_id(
-                user_id=userId, email_info=email_info_db)
+            email = eqm.get_email_by_user_id_and_email_id(
+                user_id=userId, email_id=email_id)
+            print(email)
+
+            if email is not None:
+                rsp = Response("user/email conflict", status=409,
+                               content_type="text/plain")
+                return rsp
+
+            eqm.add_email_by_user_id(
+                user_id=userId, email_id=email_id, email_info=email_info_db)
 
             email = eqm.get_email_by_user_id_and_email_id(
                 user_id=userId, email_id=email_id)
@@ -392,10 +410,19 @@ def add_phone_by_user_id(userId):
                        content_type="text/plain")
         return rsp
 
+    phone_id = hash_uuid(phone_info_db["phone_number"])
+
     try:
         with PhoneQueryModel() as pqm:
-            phone_id = pqm.add_phone_by_user_id(
-                user_id=userId, phone_info=phone_info_db)
+            phone = pqm.get_phone_by_user_id_and_phone_id(
+                user_id=userId, phone_id=phone_id)
+            if phone is not None:
+                rsp = Response("user/phone conflict", status=409,
+                               content_type="text/plain")
+                return rsp
+
+            pqm.add_phone_by_user_id(
+                user_id=userId, phone_id=phone_id, phone_info=phone_info_db)
 
             phone = pqm.get_phone_by_user_id_and_phone_id(
                 user_id=userId, phone_id=phone_id)
@@ -565,10 +592,20 @@ def add_address_by_user_id(userId):
                        content_type="text/plain")
         return rsp
 
+    address_id = hash_uuid(" ".join([address_info_db["address_line1"], address_info_db["city"],address_info_db["state"],address_info_db["zip"]]))
+
     try:
         with AddressQueryModel() as aqm:
-            address_id = aqm.add_address_by_user_id(
-                user_id=userId, address_info=address_info_db)
+            address = aqm.get_address_by_user_id_and_address_id(
+                user_id=userId, address_id=address_id)
+
+            if address is not None:
+                rsp = Response("user/phone conflict", status=409,
+                               content_type="text/plain")
+                return rsp
+
+            aqm.add_address_by_user_id(
+                user_id=userId, address_id=address_id, address_info=address_info_db)
 
             address = aqm.get_address_by_user_id_and_address_id(
                 user_id=userId, address_id=address_id)
