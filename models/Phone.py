@@ -56,3 +56,10 @@ class PhoneQueryModel(BaseQueryModel):
             Phone.phone_id == phone_id).filter(Phone.is_active == True).first()
         phone.is_active = False
         self.session.commit()
+
+    def delete_phone_by_user_id(self, user_id):
+        phones = self.session.query(Phone).filter(
+            Phone.user_id == user_id).filter(Phone.is_active == True).all()
+        for phone in phones:
+            phone.is_active = False
+        self.session.commit()

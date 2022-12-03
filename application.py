@@ -193,6 +193,19 @@ def contact_info_by_user_id(userId):
                 if user_contact:
                     ucqm.delete_user_contacts_by_user_id(user_id=userId)
 
+                    with EmailQueryModel() as eqm:
+                        eqm.delete_email_by_user_id(
+                            user_id=userId)
+
+                    with PhoneQueryModel() as pqm:
+                        pqm.delete_phone_by_user_id(
+                            user_id=userId)
+
+                    with AddressQueryModel() as aqm:
+                        aqm.delete_address_by_user_id(
+                            user_id=userId
+                        )
+
                     rsp = Response("ok", status=200,
                                    content_type="application/json")
                     return rsp

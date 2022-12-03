@@ -57,3 +57,10 @@ class AddressQueryModel(BaseQueryModel):
             Address.address_id == address_id).filter(Address.is_active == True).first()
         address.is_active = False
         self.session.commit()
+
+    def delete_address_by_user_id(self, user_id):
+        addresses = self.session.query(Address).filter(
+            Address.user_id == user_id).filter(Address.is_active == True).all()
+        for address in addresses:
+            address.is_active = False
+        self.session.commit()

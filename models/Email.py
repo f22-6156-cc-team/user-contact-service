@@ -57,3 +57,10 @@ class EmailQueryModel(BaseQueryModel):
             Email.email_id == email_id).filter(Email.is_active == True).first()
         email.is_active = False
         self.session.commit()
+
+    def delete_email_by_user_id(self, user_id):
+        emails = self.session.query(Email).filter(
+            Email.user_id == user_id).filter(Email.is_active == True).all()
+        for email in emails:
+            email.is_active = False
+        self.session.commit()
